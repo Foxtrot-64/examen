@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen — Procédure 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d12;
+  --surface: #13131a;
+  --surface2: #1a1a24;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+  --accent: #7b6ef6;
+  --accent2: #5b4fcf;
+  --text: #f0f0f5;
+  --muted: #8888a0;
+  --danger: #f06060;
+  --success: #50c878;
+  --gold: #f5c842;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;line-height:1.6}
+.noise{position:fixed;inset:0;pointer-events:none;opacity:.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");z-index:0}
+.container{max-width:720px;margin:0 auto;padding:2rem 1.5rem;position:relative;z-index:1}
+
+/* Header */
+.exam-header{text-align:center;padding:3rem 0 2.5rem}
+.rank-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border2);border-radius:100px;padding:6px 16px;font-family:'Syne',sans-serif;font-size:12px;font-weight:600;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:1.5rem}
+.rank-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);display:block}
+.exam-title{font-family:'Syne',sans-serif;font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:1rem}
+.exam-title span{color:var(--accent)}
+.exam-meta{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-top:1.5rem}
+.meta-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.meta-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:.6}
+.rules{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2.5rem;font-size:13.5px;color:var(--muted);line-height:1.8}
+.rules strong{color:var(--text)}
+
+/* Timer */
+.timer-bar{position:sticky;top:0;z-index:100;background:rgba(13,13,18,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:10px 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.timer-label{font-size:12px;color:var(--muted);font-family:'Syne',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.timer-count{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--text);transition:color .3s}
+.timer-count.warn{color:var(--gold)}
+.timer-count.danger{color:var(--danger)}
+.progress-track{flex:1;height:3px;background:var(--border2);margin:0 1.5rem;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .5s}
+
+/* Candidate info */
+.section-header{display:flex;align-items:center;gap:12px;margin:2rem 0 1rem}
+.section-num{width:28px;height:28px;border-radius:6px;background:var(--accent);font-family:'Syne',sans-serif;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-title{font-family:'Syne',sans-serif;font-weight:600;font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+
+/* Questions */
+.q-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1rem;transition:border-color .2s}
+.q-card:focus-within{border-color:var(--border2)}
+.q-num{font-size:11px;font-family:'Syne',sans-serif;font-weight:700;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem}
+.q-points{float:right;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--muted);font-family:'Syne',sans-serif}
+.q-text{font-size:15px;font-weight:500;color:var(--text);margin-bottom:1.25rem;line-height:1.6}
+.q-text em{color:var(--muted);font-style:normal}
+textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;resize:vertical;min-height:100px;line-height:1.6;transition:border-color .2s;outline:none}
+textarea:focus{border-color:var(--accent)}
+textarea::placeholder{color:var(--muted)}
+input[type=text]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s;outline:none}
+input[type=text]:focus{border-color:var(--accent)}
+input[type=text]::placeholder{color:var(--muted)}
+
+/* MCQ */
+.options{display:flex;flex-direction:column;gap:8px;margin-top:.25rem}
+.option-label{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:border-color .2s;font-size:14px}
+.option-label:hover{border-color:var(--border2)}
+.option-label input{margin-top:2px;accent-color:var(--accent);flex-shrink:0}
+.option-label.selected{border-color:var(--accent);background:rgba(123,110,246,.08)}
+
+/* Submit */
+.submit-wrap{padding:2rem 0 3rem;text-align:center}
+.submit-btn{background:var(--accent);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;letter-spacing:.04em;padding:14px 40px;border:none;border-radius:12px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:10px}
+.submit-btn:hover{background:var(--accent2);transform:translateY(-1px)}
+.submit-btn:active{transform:translateY(0)}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* Success screen */
+.success-screen{display:none;text-align:center;padding:4rem 0}
+.success-icon{width:80px;height:80px;border-radius:50%;background:rgba(80,200,120,.15);border:2px solid var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:36px}
+.success-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:.75rem}
+.success-sub{color:var(--muted);font-size:15px;max-width:380px;margin:0 auto}
+
+/* Overdue */
+.overdue-screen{display:none;text-align:center;padding:4rem 0}
+.overdue-icon{width:80px;height:80px;border-radius:50%;background:rgba(240,96,96,.12);border:2px solid var(--danger);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:36px}
+
+.required-star{color:var(--danger);margin-left:3px}
+.field-label{font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.date-input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:500px){.date-input-row{grid-template-columns:1fr}.exam-meta{gap:1rem}}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<!-- Timer bar -->
+<div class="timer-bar" id="timerBar" style="display:none">
+  <span class="timer-label">Temps restant</span>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:100%"></div></div>
+  <span class="timer-count" id="timerCount">25:00</span>
+</div>
+
+<div class="container">
+
+  <!-- Overdue -->
+  <div class="overdue-screen" id="overdueScreen">
+    <div class="overdue-icon">⏱</div>
+    <h2 style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;margin-bottom:.75rem">Temps écoulé</h2>
+    <p style="color:var(--muted);font-size:15px">Vous avez dépassé le temps limite de 25 minutes.<br>Votre examen a été automatiquement soumis.</p>
+  </div>
+
+  <!-- Success -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <h2 class="success-title">Copie envoyée !</h2>
+    <p class="success-sub">Votre examen a bien été transmis aux formateurs. Vous pouvez fermer cette page.</p>
+  </div>
+
+  <!-- Exam form -->
+  <div id="examContent">
+    <div class="exam-header">
+      <div class="rank-badge">Formation Procédure</div>
+      <h1 class="exam-title">Examen<br><span>Procédure 2</span></h1>
+      <div class="exam-meta">
+        <div class="meta-item"><span class="meta-dot"></span>25 minutes</div>
+        <div class="meta-item"><span class="meta-dot"></span>Seuil de réussite : 17/20</div>
+        <div class="meta-item"><span class="meta-dot"></span>Aucune aide autorisée</div>
+      </div>
+    </div>
+
+    <div class="rules">
+      <strong>Règles :</strong> Ne pas renseigner de fausses informations · Bien indiquer la date du jour · Toute forme de triche entraîne une convocation CS + BL.<br>
+      Le(s) formateur(s) présent(s) ne vous aideront pas. <strong>AUCUNE QUESTION PENDANT L'EXAMEN.</strong><br>
+      <strong>064 | Maxence Brown — Lead formation procédure.</strong>
+    </div>
+
+    <!-- Section 1 : infos -->
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Informations candidat</div>
+    </div>
+
+    <div class="q-card">
+      <div class="field-label">Matricule | Prénom Nom<span class="required-star">*</span></div>
+      <input type="text" id="candidat" placeholder="Ex : 042 | Jean Dupont" />
+    </div>
+    <div class="q-card">
+      <div class="field-label">Date de l'examen<span class="required-star">*</span></div>
+      <input type="text" id="dateExam" placeholder="Ex : 21/05/2026" />
+    </div>
+
+    <!-- Questions injected by JS -->
+    <div id="questionsWrap"></div>
+
+    <div class="submit-wrap">
+      <button class="submit-btn" id="submitBtn" onclick="submitExam()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+        Soumettre ma copie
+      </button>
+      <p style="font-size:12px;color:var(--muted);margin-top:1rem">Vérifiez bien vos réponses avant d'envoyer.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'proc2_questions';
+const SUBMISSIONS_KEY = 'proc2_submissions';
+const DURATION = 25 * 60;
+
+let timeLeft = DURATION;
+let timerInterval;
+let submitted = false;
+
+// Load questions from storage (shared with admin)
+async function loadQuestions() {
+  try {
+    const r = await window.storage.get('proc2_questions', true);
+    if (r && r.value) return JSON.parse(r.value);
+  } catch(e){}
+  return getDefaultQuestions();
+}
+
+function getDefaultQuestions() {
+  return [
+    {id:'q1',section:'Question Théorique',text:'Quelles sont les étapes d\'une Procédure, de l\'arrestation (fin de la poursuite) à l\'annonce du 10-15 ?',type:'open',points:1},
+    {id:'q2',section:'Question Théorique',text:'Que dois-je faire si aucun agent du même sexe qu\'un prévenu n\'est disponible dans mon District pour une Palpation ? (Soyez précis)',type:'open',points:1},
+    {id:'q3',section:'Question Théorique',text:'Dans quelles circonstances le recours à un État-Major est-il nécessaire ?',type:'open',points:1},
+    {id:'q4',section:'Question Théorique',text:'Qui peut autoriser un agent à retenir le Chef d\'inculpation "Association de Malfaiteurs" ?',type:'mcq',points:1,options:['Un membre de l\'État-Major','La supervision (Sergent I & II)','N\'importe quel agent','Les Procureurs et Juges'],correct:[0]},
+    {id:'q5',section:'Question Théorique',text:'Que faire si l\'individu ne possède pas sa carte d\'identité et est masqué lorsque vous souhaitez lui lire ses droits Miranda ?',type:'open',points:1},
+    {id:'q6',section:'Question Théorique',text:'Parmi ces informations, lesquelles sont correctes ?',type:'mcq_multi',points:3,options:['Face à un avocat, je suis le seul décisionnaire de la retenue de peine','Un avocat peut exiger un procureur/juge si un chef d\'inculpation ne lui convient pas','Un avocat a le dernier mot sur le temps de prison fédéral','Lors d\'une CI, la présomption d\'innocence a l\'avantage sur la présomption de culpabilité','CI est l\'abréviation de : "Comparution Immédiate"'],correct:[0,4]},
+    {id:'q7',section:'Question Théorique',text:'Qui peut appliquer une Min 1 / Max 1 ?',type:'open',points:1},
+    {id:'q8',section:'Question Pratique',text:'Monsieur Thomas Hisoto a été interpellé par les agents 064 et 022 à la suite d\'un Cambriolage masqué. Lors de son arrestation, une machette a été découverte ainsi qu\'un Pistolet de Combat saisis. Dans son véhicule : 2 télévisions, 1 imprimante, 2 livres, 1 console de jeux. La lecture des droits a été effectuée immédiatement. Il a demandé un avocat et de l\'eau. Fouille complète : 54 munitions de pistolet, 5 003$ en liquide, 3 cartes prépayées. L\'avocat est Mike Harlton. Accord : Min 2, plaidé coupable. Motif : Ouverture de casier + Coopérativité.\n\nCette feuille de calcul contient-elle des erreurs ? Si oui, relevez-les.',type:'open',points:3},
+    {id:'q9',section:'Question Pratique',text:'Le document suite à la non-disponibilité des Proc/Juge/EM est-il correct ? Détaillez votre réponse.',type:'open',points:1},
+    {id:'q10',section:'Question Pratique',text:'Lorsqu\'un prévenu n\'arrête pas de vous insulter en procédure, que devez-vous faire ?',type:'mcq',points:1,options:['L\'insulter en retour et lui faire une procédure montagne','Abandonner la procédure et le mettre en TIG','Garder votre sang froid puis, une fois qu\'il a payé l\'amende, le matraquer','Garder votre sang froid et lui ajouter un chef d\'inculpation adéquat si besoin'],correct:[3]},
+    {id:'q11',section:'Question Pratique',text:'Le casier ci-dessous est-il correct ?',type:'mcq',points:1,options:['Oui','Non'],correct:[0]},
+    {id:'q12',section:'Question Pratique',text:'Monsieur Elba (Nom) Aaron (Prénom) a été interpellé suite à un Braquage de Fleeca. Lors du braquage : 3 otages civils, refus d\'obtempérer. Après poursuite, le véhicule a été immobilisé. Palpation : pistolet et Dague Antique saisis. Lecture des droits à la sortie du véhicule. Il demande soins et avocat. Il a tenté de s\'échapper une fois démenotté et vous a insulté de "Flic de merde". Fouille complète : 45 pochons de Cocaïne, 32 de Datura. Plaidé non coupable. Maître Miranda Walker défend son client. Le prévenu nie en bloc et insulte l\'agent de "Sombre merde". Le Lieutenant 096 Ahmed Bello requiert une Max 1 — Motif : récidive, non coopérativité.\n\nComplétez la feuille de calcul en conséquence. Prenez compte de chaque détail.',type:'open',points:5},
+  ];
+}
+
+async function init() {
+  const questions = await loadQuestions();
+  renderQuestions(questions);
+  startTimer();
+  document.getElementById('timerBar').style.display = 'flex';
+}
+
+function renderQuestions(questions) {
+  const wrap = document.getElementById('questionsWrap');
+  let lastSection = '';
+  let sectionNum = 1;
+  let html = '';
+
+  questions.forEach((q, i) => {
+    if (q.section !== lastSection) {
+      sectionNum++;
+      html += `<div class="section-header"><div class="section-num">${sectionNum}</div><div class="section-title">${q.section}</div></div>`;
+      lastSection = q.section;
+    }
+
+    let input = '';
+    if (q.type === 'open') {
+      input = `<textarea id="${q.id}" placeholder="Votre réponse..." rows="4"></textarea>`;
+    } else if (q.type === 'mcq') {
+      input = `<div class="options">${q.options.map((opt,oi) =>
+        `<label class="option-label" id="lbl_${q.id}_${oi}">
+          <input type="radio" name="${q.id}" value="${oi}" onchange="updateOptionStyle(this,'${q.id}')"> ${opt}
+        </label>`).join('')}</div>`;
+    } else if (q.type === 'mcq_multi') {
+      input = `<div class="options">${q.options.map((opt,oi) =>
+        `<label class="option-label" id="lbl_${q.id}_${oi}">
+          <input type="checkbox" name="${q.id}" value="${oi}" onchange="updateOptionStyle(this,'${q.id}')"> ${opt}
+        </label>`).join('')}</div>`;
+    }
+
+    html += `<div class="q-card">
+      <div class="q-num">Question ${i+1} <span class="q-points">${q.points} pt${q.points>1?'s':''}</span></div>
+      <div class="q-text">${q.text.replace(/\n/g,'<br>')}</div>
+      ${input}
+    </div>`;
+  });
+
+  wrap.innerHTML = html;
+  wrap._questions = questions;
+}
+
+function updateOptionStyle(input, qid) {
+  const type = input.type;
+  const name = input.name;
+  document.querySelectorAll(`[id^="lbl_${qid}_"]`).forEach(lbl => lbl.classList.remove('selected'));
+  if (type === 'radio') {
+    if (input.checked) document.getElementById(`lbl_${qid}_${input.value}`).classList.add('selected');
+  } else {
+    document.querySelectorAll(`input[name="${name}"]:checked`).forEach(cb => {
+      document.getElementById(`lbl_${qid}_${cb.value}`).classList.add('selected');
+    });
+  }
+}
+
+function startTimer() {
+  const fill = document.getElementById('progressFill');
+  const count = document.getElementById('timerCount');
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    count.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    fill.style.width = (timeLeft / DURATION * 100) + '%';
+
+    if (timeLeft <= 300) count.className = 'timer-count warn';
+    if (timeLeft <= 60) count.className = 'timer-count danger';
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      autoSubmit();
+    }
+  }, 1000);
+}
+
+function autoSubmit() {
+  submitExam(true);
+}
+
+async function submitExam(auto = false) {
+  if (submitted) return;
+  const candidat = document.getElementById('candidat').value.trim();
+  const dateExam = document.getElementById('dateExam').value.trim();
+
+  if (!auto && (!candidat || !dateExam)) {
+    alert('Merci de renseigner votre matricule et la date de l\'examen.');
+    return;
+  }
+
+  submitted = true;
+  clearInterval(timerInterval);
+  document.getElementById('submitBtn').disabled = true;
+
+  const questions = document.getElementById('questionsWrap')._questions || [];
+  const answers = {};
+
+  questions.forEach(q => {
+    if (q.type === 'open') {
+      answers[q.id] = document.getElementById(q.id)?.value || '';
+    } else if (q.type === 'mcq') {
+      const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+      answers[q.id] = checked ? parseInt(checked.value) : null;
+    } else if (q.type === 'mcq_multi') {
+      const checked = [...document.querySelectorAll(`input[name="${q.id}"]:checked`)];
+      answers[q.id] = checked.map(c => parseInt(c.value));
+    }
+  });
+
+  const submission = {
+    id: Date.now(),
+    candidat: candidat || 'Anonyme',
+    dateExam: dateExam || 'N/A',
+    answers,
+    submittedAt: new Date().toLocaleString('fr-FR'),
+    late: auto,
+    status: 'pending',
+    scores: {}
+  };
+
+  // Save to shared storage
+  try {
+    let all = [];
+    try {
+      const r = await window.storage.get('proc2_submissions', true);
+      if (r) all = JSON.parse(r.value);
+    } catch(e){}
+    all.push(submission);
+    await window.storage.set('proc2_submissions', JSON.stringify(all), true);
+  } catch(e){ console.error(e); }
+
+  document.getElementById('examContent').style.display = 'none';
+  document.getElementById('timerBar').style.display = 'none';
+  if (auto) {
+    document.getElementById('overdueScreen').style.display = 'block';
+  } else {
+    document.getElementById('successScreen').style.display = 'block';
+  }
+}
+
+init();
+</script>
+</body>
+</html>
